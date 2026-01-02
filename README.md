@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# VRC Poker HUD (8-MAX カチカチ君 Edition)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+VRChatでのポーカープレイ中に、相手の動向を「カチカチ君」のように素早くメモ・集計するための簡易的なHUD（Webアプリ）です。
+フロントエンドのみで動作し、ブラウザ内のSQLite (WASM) でデータを管理します。
 
-Currently, two official plugins are available:
+## ⚠️ 免責事項 (Disclaimer)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **本ツールの使用によって生じたいかなる損失、損害、トラブルについても、開発者は一切の責任を負いません。**
+- ギャンブルを助長するものではなく、あくまで個人の学習・メモ用ツールです。
+- 各プラットフォーム（VRChat等）の規約を遵守して使用してください。
 
-## React Compiler
+## 特徴
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **8-MAX対応**: 4人+4人の対面レイアウト。
+- **クイック・カウント**: Limp, PFR, 3B+ などのアクションを1タップで記録。
+- **Showdownメモ**: 相手の手札の強さ（NUTS, VAL, MAR, BAD）を記録可能。
+- **インテリジェント・タグ**: Shark, GTO, Maniacなどのタグを付けると、カードの背景色が連動して変化。一目で相手のタイプを判別。
+- **SQLite 永続化**: ブラウザを閉じてもデータは自動保存されます。
+- **データ出力**: 記録したデータを `.sqlite` 形式でエクスポート可能。
 
-## Expanding the ESLint configuration
+## 使い方 (Setup)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+本格的なツールが欲しい方は、これをベースに自分で開発してください。
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# リポジトリをクローン
+git clone https://github.com/LC3615/VRCPOKERHUD1.git
+cd VRCPOKERHUD1
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# 依存関係のインストール
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 開発サーバーの起動
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+表示されたローカルURL（localhost:5173など）をブラウザで開いて使用してください。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 技術スタック
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- React / TypeScript / Vite
+- Tailwind CSS (v3)
+- SQLite WASM (sql.js)
+- localforage (IndexedDB persistence)
+- Lucide React (Icons)
