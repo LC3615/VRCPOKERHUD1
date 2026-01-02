@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { initDB, getPlayers, getAllPastPlayers, getActionCounts, addAction, updatePlayerName, updatePlayerTags, updatePlayerLevel, updatePlayerNote, loadPlayerToSeat, resetPlayerSeat, resetActions, exportDB } from './db';
+import React, { useEffect, useState, useRef } from 'react';
+import { initDB, getPlayers, getAllPastPlayers, getActionCounts, addAction, updatePlayerName, updatePlayerTags, updatePlayerLevel, updatePlayerNote, loadPlayerToSeat, resetPlayerSeat, resetActions, exportDB, importDB } from './db';
 import PlayerCard from './components/PlayerCard';
-import { Database } from 'lucide-react';
+import { Database, Upload } from 'lucide-react';
 
 function App() {
   const [dbReady, setDbReady] = useState(false);
   const [players, setPlayers] = useState<any[]>([]);
   const [pastPlayers, setPastPlayers] = useState<any[]>([]);
   const [counts, setCounts] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshData = () => {
     setPlayers(getPlayers());
@@ -64,6 +65,27 @@ function App() {
     }
   };
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (window.confirm('現在のデータが上書きされます。よろしいですか？')) {
+      try {
+        await importDB(file);
+        refreshData();
+        alert('インポートが完了しました。');
+      } catch (err) {
+        alert('エラー: 有効なSQLiteファイルではありません。');
+      }
+    }
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   if (!dbReady) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-slate-900 text-white">
@@ -99,6 +121,20 @@ function App() {
           <p className="text-[10px] text-slate-500 uppercase font-bold">8-MAX (4+4) カチカチ君 Edition</p>
         </div>
         <div className="flex gap-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".sqlite"
+            className="hidden"
+          />
+          <button
+            onClick={handleImportClick}
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded border border-slate-700 transition-colors flex items-center gap-1"
+          >
+            <Upload size={14} />
+            IMPORT
+          </button>
           <button
             onClick={handleReset}
             className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded border border-slate-700 transition-colors"

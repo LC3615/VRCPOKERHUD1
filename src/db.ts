@@ -153,3 +153,24 @@ export const exportDB = async () => {
   URL.revokeObjectURL(url);
 };
 
+export const importDB = async (file: File): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const data = new Uint8Array(reader.result as ArrayBuffer);
+        // 新しいデータベースインスタンスを作成して既存のdbを差し替える
+        const newDb = new SQL.Database(data);
+        db = newDb;
+        // 永続化ストレージも更新
+        await localforage.setItem(DB_KEY, data);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+};
+
