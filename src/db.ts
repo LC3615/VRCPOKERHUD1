@@ -66,6 +66,25 @@ export const getPlayers = () => {
   });
 };
 
+export const getAllPastPlayers = () => {
+  const res = db.exec("SELECT DISTINCT name, tags, level, note FROM players WHERE name != ''");
+  if (res.length === 0) return [];
+  const columns = res[0].columns;
+  return res[0].values.map(row => {
+    const obj: any = {};
+    columns.forEach((col, i) => obj[col] = row[i]);
+    return obj;
+  });
+};
+
+export const loadPlayerToSeat = async (seatId: number, playerData: any) => {
+  db.run(
+    "UPDATE players SET name = ?, tags = ?, level = ?, note = ? WHERE id = ?",
+    [playerData.name, playerData.tags, playerData.level, playerData.note, seatId]
+  );
+  await saveDB();
+};
+
 export const getActionCounts = () => {
   const res = db.exec(`
     SELECT player_id, action_type, COUNT(*) as count 

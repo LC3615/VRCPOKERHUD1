@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { initDB, getPlayers, getActionCounts, addAction, updatePlayerName, updatePlayerTags, updatePlayerLevel, updatePlayerNote, resetPlayerSeat, resetActions, exportDB } from './db';
+import { initDB, getPlayers, getAllPastPlayers, getActionCounts, addAction, updatePlayerName, updatePlayerTags, updatePlayerLevel, updatePlayerNote, loadPlayerToSeat, resetPlayerSeat, resetActions, exportDB } from './db';
 import PlayerCard from './components/PlayerCard';
 import { Database } from 'lucide-react';
 
 function App() {
   const [dbReady, setDbReady] = useState(false);
   const [players, setPlayers] = useState<any[]>([]);
+  const [pastPlayers, setPastPlayers] = useState<any[]>([]);
   const [counts, setCounts] = useState<any[]>([]);
 
   const refreshData = () => {
     setPlayers(getPlayers());
+    setPastPlayers(getAllPastPlayers());
     setCounts(getActionCounts());
   };
 
@@ -47,6 +49,11 @@ function App() {
 
   const handlePlayerReset = async (playerId: number) => {
     await resetPlayerSeat(playerId);
+    refreshData();
+  };
+
+  const handleLoadPlayer = async (seatId: number, playerData: any) => {
+    await loadPlayerToSeat(seatId, playerData);
     refreshData();
   };
 
@@ -115,12 +122,14 @@ function App() {
               key={p.id}
               player={p}
               actionCounts={getPlayerCounts(p.id)}
+              pastPlayers={pastPlayers}
               onAction={handleAction}
               onNameUpdate={handleNameUpdate}
               onTagsUpdate={handleTagsUpdate}
               onLevelUpdate={handleLevelUpdate}
               onNoteUpdate={handleNoteUpdate}
               onReset={handlePlayerReset}
+              onLoadPlayer={handleLoadPlayer}
             />
           ))}
         </div>
@@ -143,12 +152,14 @@ function App() {
               key={p.id}
               player={p}
               actionCounts={getPlayerCounts(p.id)}
+              pastPlayers={pastPlayers}
               onAction={handleAction}
               onNameUpdate={handleNameUpdate}
               onTagsUpdate={handleTagsUpdate}
               onLevelUpdate={handleLevelUpdate}
               onNoteUpdate={handleNoteUpdate}
               onReset={handlePlayerReset}
+              onLoadPlayer={handleLoadPlayer}
             />
           ))}
         </div>

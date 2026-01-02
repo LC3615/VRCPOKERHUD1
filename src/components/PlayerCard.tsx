@@ -17,12 +17,14 @@ interface ActionCount {
 interface PlayerCardProps {
   player: Player;
   actionCounts: ActionCount;
+  pastPlayers: any[];
   onAction: (playerId: number, action: string) => void;
   onNameUpdate: (playerId: number, name: string) => void;
   onTagsUpdate: (playerId: number, tags: string) => void;
   onLevelUpdate: (playerId: number, level: number) => void;
   onNoteUpdate: (playerId: number, note: string) => void;
   onReset: (playerId: number) => void;
+  onLoadPlayer: (seatId: number, playerData: any) => void;
 }
 
 const ACTIONS = [
@@ -56,29 +58,38 @@ const PRESET_TAGS = [
 const PlayerCard: React.FC<PlayerCardProps> = ({ 
   player, 
   actionCounts, 
+  pastPlayers,
   onAction, 
   onNameUpdate, 
   onTagsUpdate, 
   onLevelUpdate, 
   onNoteUpdate,
-  onReset
+  onReset,
+  onLoadPlayer
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(player.name);
   const [showTags, setShowTags] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const activeTagIds = player.tags ? player.tags.split(',') : [];
   
-  // Get the background color from the first active tag if any
-  const getHeaderColor = () => {
-    if (activeTagIds.length === 0) return 'bg-slate-800';
-    const firstTag = PRESET_TAGS.find(t => t.id === activeTagIds[0]);
-    return firstTag ? firstTag.color : 'bg-slate-800';
-  };
+  // Get filtered history based on input
+  const historyResults = pastPlayers.filter(p => 
+    p.name.toLowerCase().includes(tempName.toLowerCase()) && p.name !== ''
+  );
 
   const handleNameSave = () => {
     onNameUpdate(player.id, tempName);
     setIsEditing(false);
+    setShowHistory(false);
+  };
+
+  const handleSelectHistory = (historyItem: any) => {
+    onLoadPlayer(player.id, historyItem);
+    setTempName(historyItem.name);
+    setIsEditing(false);
+    setShowHistory(false);
   };
 
   const handleLevelChange = (delta: number) => {
@@ -111,16 +122,35 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
             <User size={14} className="text-white" />
           </div>
           {isEditing ? (
-            <div className="flex items-center gap-1">
+            <div className="relative flex items-center gap-1">
               <input
                 type="text"
                 value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
+                onChange={(e) => {
+                  setTempName(e.target.value);
+                  setShowHistory(true);
+                }}
                 className="bg-black/40 text-white text-xs px-1 py-0.5 rounded border border-white/20 w-20 outline-none"
                 autoFocus
-                onBlur={handleNameSave}
                 onKeyDown={(e) => e.key === 'Enter' && handleNameSave()}
               />
+              {showHistory && historyResults.length > 0 && (
+                <div className="absolute top-full left-0 w-48 bg-slate-900 border border-slate-700 rounded shadow-2xl z-50 max-h-32 overflow-y-auto mt-1">
+                  {historyResults.map((hp, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSelectHistory(hp)}
+                      className="w-full text-left px-2 py-1.5 hover:bg-blue-900 text-[10px] text-white border-b border-slate-800 last:border-0"
+                    >
+                      <div className="font-bold">{hp.name}</div>
+                      <div className="text-[8px] text-slate-400">Lv{hp.level} {hp.tags}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              <button onClick={handleNameSave} className="text-white/60 hover:text-white">
+                <Check size={12} />
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-1 overflow-hidden">
