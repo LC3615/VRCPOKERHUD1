@@ -38,6 +38,11 @@ export const initDB = async (): Promise<Database> => {
       );
     `);
 
+    // Ensure columns exist (for existing databases)
+    try { db.run("ALTER TABLE players ADD COLUMN level INTEGER DEFAULT 1"); } catch(e) {}
+    try { db.run("ALTER TABLE players ADD COLUMN tags TEXT DEFAULT ''"); } catch(e) {}
+    try { db.run("ALTER TABLE players ADD COLUMN note TEXT DEFAULT ''"); } catch(e) {}
+
     // Initialize 8 seats
     for (let i = 1; i <= 8; i++) {
       db.run('INSERT INTO players (seat_no, name) VALUES (?, ?)', [i, `Player ${i}`]);

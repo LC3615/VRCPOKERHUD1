@@ -74,6 +74,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
 
   const activeTagIds = player.tags ? player.tags.split(',') : [];
   
+  // Get the background color from the first active tag if any
+  const getHeaderColor = () => {
+    if (activeTagIds.length === 0) return 'bg-slate-800';
+    const firstTag = PRESET_TAGS.find(t => t.id === activeTagIds[0]);
+    return firstTag ? firstTag.color : 'bg-slate-800';
+  };
+
   // Get filtered history based on input
   const historyResults = pastPlayers.filter(p => 
     p.name.toLowerCase().includes(tempName.toLowerCase()) && p.name !== ''
