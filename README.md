@@ -1,5 +1,7 @@
 # VRC Poker HUD (8-MAX カチカチ君 Edition)
 
+![Screenshot](./public/rm.png)
+
 VRChatでのポーカープレイ中に、相手の動向を「カチカチ君」のように素早くメモ・集計するための簡易的なHUD（Webアプリ）です。
 フロントエンドのみで動作し、ブラウザ内のSQLite (WASM) でデータを管理します。
 
