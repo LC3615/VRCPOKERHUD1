@@ -17,6 +17,10 @@ export const initDB = async (): Promise<Database> => {
   
   if (savedData) {
     db = new SQL.Database(savedData);
+    // Ensure columns exist (for existing databases)
+    try { db.run("ALTER TABLE players ADD COLUMN level INTEGER DEFAULT 1"); } catch(e) {}
+    try { db.run("ALTER TABLE players ADD COLUMN tags TEXT DEFAULT ''"); } catch(e) {}
+    try { db.run("ALTER TABLE players ADD COLUMN note TEXT DEFAULT ''"); } catch(e) {}
   } else {
     db = new SQL.Database();
     // Initialize tables
@@ -37,11 +41,6 @@ export const initDB = async (): Promise<Database> => {
         FOREIGN KEY(player_id) REFERENCES players(id)
       );
     `);
-
-    // Ensure columns exist (for existing databases)
-    try { db.run("ALTER TABLE players ADD COLUMN level INTEGER DEFAULT 1"); } catch(e) {}
-    try { db.run("ALTER TABLE players ADD COLUMN tags TEXT DEFAULT ''"); } catch(e) {}
-    try { db.run("ALTER TABLE players ADD COLUMN note TEXT DEFAULT ''"); } catch(e) {}
 
     // Initialize 8 seats
     for (let i = 1; i <= 8; i++) {
